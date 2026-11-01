@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ScoutVision</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<body class="app-body">
+    <div class="app-shell">
+
+        <aside class="sidebar">
+
+            <a class="brand brand-small"
+               asp-controller="Home"
+               asp-action="Index">
+
+                <div class="brand-icon">SV</div>
+
+                <div>
+                    <div class="brand-name">
+                        <span>Scout</span><strong>Vision</strong>
+                    </div>
+
+                    <div class="brand-tagline">
+                        ANÁLISIS QUE DESCUBRE TALENTO
+                    </div>
+                </div>
+            </a>
+
+            <nav class="sidebar-nav">
+
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="nav-link">
+                    <span class="nav-icon">⌂</span>
+                    <span>Inicio</span>
+                </a>
+
+                <a asp-controller="Jugadores"
+                   asp-action="Index"
+                   class="nav-link">
+                    <span class="nav-icon">♙</span>
+                    <span>Jugadores</span>
+                </a>
+
+                <a asp-controller="Equipos"
+                   asp-action="Index"
+                   class="nav-link">
+                    <span class="nav-icon">♟</span>
+                    <span>Equipos</span>
+                </a>
+
+                <a asp-controller="Partidos"
+                   asp-action="Index"
+                   class="nav-link">
+                    <span class="nav-icon">▣</span>
+                    <span>Partidos</span>
+                </a>
+
+                <a asp-controller="Semaforizacion"
+                   asp-action="Index"
+                   class="nav-link">
+                    <span class="nav-icon">▥</span>
+                    <span>Semaforización</span>
+                </a>
+
+                <a asp-controller="Reportes"
+                   asp-action="Index"
+                   class="nav-link">
+                    <span class="nav-icon">▤</span>
+                    <span>Reportes</span>
+                </a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+
+                <div class="avatar">SV</div>
+
+                <div class="user-copy">
+                    <strong>@Context.Session.GetString("Username")</strong>
+                    <span>Analista</span>
+                </div>
+
+                <form asp-controller="Auth"
+                      asp-action="Logout"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <button class="logout-button"
+                            type="submit"
+                            title="Cerrar sesión">
+                        ↪
+                    </button>
+
+                </form>
+
+            </div>
+
+        </aside>
+
+        <main class="main-content">
+            @RenderBody()
+        </main>
+
+    </div>
+
+    <script src="~/js/site.js"
+            asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

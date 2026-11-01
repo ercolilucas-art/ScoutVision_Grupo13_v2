@@ -1,0 +1,336 @@
+﻿@model ScoutVision.Web.Models.PartidoDetalleViewModel
+
+@{
+    ViewData["Title"] = "Detalle del partido";
+}
+
+<style>
+    /* Navegación */
+
+    .pd-back {
+        display: inline-flex;
+        margin-bottom: 22px;
+        color: #9fea58;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+        .pd-back:hover {
+            opacity: .8;
+            color: #9fea58;
+        }
+
+    /* Tarjetas */
+
+    .pd-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 26px;
+        margin-top: 22px;
+    }
+
+        .pd-card h2 {
+            color: #eef6fb;
+            font-size: 20px;
+            margin: 0 0 20px;
+        }
+
+    /* Resultado del partido */
+
+    .pd-match {
+        background: rgba(255, 255, 255, .025);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 30px 18px;
+        text-align: center;
+    }
+
+    .pd-date {
+        color: #a7bdcc;
+        font-size: 13px;
+        margin-bottom: 18px;
+    }
+
+    .pd-scoreboard {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 18px;
+        align-items: center;
+    }
+
+    .pd-team {
+        color: #eef6fb;
+        font-weight: 750;
+        font-size: 20px;
+        overflow-wrap: anywhere;
+    }
+
+    .pd-score {
+        color: #9fea58;
+        font-size: 38px;
+        font-weight: 850;
+        white-space: nowrap;
+    }
+
+    /* Tabla de jugadores */
+
+    .pd-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+    }
+
+    .pd-table {
+        width: 100%;
+        min-width: 940px;
+        border-collapse: collapse;
+    }
+
+        .pd-table th {
+            padding: 15px 12px;
+            color: #a7bdcc;
+            background: rgba(255, 255, 255, .045);
+            font-weight: 700;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .pd-table td {
+            padding: 15px 12px;
+            border-top: 1px solid var(--line);
+            color: #eef6fb;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .pd-table tr:hover td {
+            background: rgba(255, 255, 255, .025);
+        }
+
+    /* Enlaces */
+
+    .pd-link {
+        color: #9fea58;
+        font-weight: 750;
+        text-decoration: none;
+    }
+
+        .pd-link:hover {
+            text-decoration: underline;
+            color: #9fea58;
+        }
+
+    /* Índice */
+
+    .pd-pill {
+        display: inline-block;
+        background: rgba(159, 234, 88, .1);
+        border: 1px solid rgba(159, 234, 88, .2);
+        border-radius: 8px;
+        padding: 7px 11px;
+        color: #9fea58;
+        font-weight: 750;
+    }
+
+    .pd-empty {
+        color: #a7bdcc;
+        font-size: 14px;
+        padding: 16px 0;
+    }
+
+    .pd-note {
+        color: #a7bdcc;
+        font-size: 13px;
+        line-height: 1.6;
+        margin-top: 20px;
+    }
+
+    @@media (max-width: 650px) {
+        .pd-card {
+            padding: 18px;
+        }
+
+        .pd-team {
+            font-size: 14px;
+        }
+
+        .pd-score {
+            font-size: 27px;
+        }
+
+        .pd-scoreboard {
+            gap: 8px;
+        }
+    }
+</style>
+
+<!-- Volver -->
+
+<a class="pd-back"
+   asp-controller="Partidos"
+   asp-action="Index">
+    ← Volver a partidos
+</a>
+
+<!-- Encabezado -->
+
+<div class="page-header">
+
+    <div>
+        <h1>Detalle <span>del partido</span></h1>
+        <p>
+            Encuentro y rendimiento individual
+            de los jugadores registrados.
+        </p>
+    </div>
+
+    <div class="season-chip">
+        Partido #@Model.Id
+    </div>
+
+</div>
+
+<!-- Resultado -->
+
+<section class="pd-card">
+
+    <h2>Información del encuentro</h2>
+
+    <div class="pd-match">
+
+        <div class="pd-date">
+            @Model.Fecha.ToString("dd/MM/yyyy")
+        </div>
+
+        <div class="pd-scoreboard">
+
+            <div class="pd-team">
+                @Model.EquipoLocal
+            </div>
+
+            <div class="pd-score">
+                @(Model.GolesLocal?.ToString() ?? "—")
+                -
+                @(Model.GolesVisitante?.ToString() ?? "—")
+            </div>
+
+            <div class="pd-team">
+                @Model.EquipoVisitante
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- Estadísticas individuales -->
+
+<section class="pd-card">
+
+    <h2>
+        Estadísticas individuales
+        (@Model.Estadisticas.Count)
+    </h2>
+
+    @if (Model.Estadisticas.Count == 0)
+    {
+        <p class="pd-empty">
+            Todavía no hay estadísticas de jugadores
+            cargadas para este partido.
+        </p>
+    }
+    else
+    {
+        <div class="pd-table-wrap">
+
+            <table class="pd-table">
+
+                <thead>
+                    <tr>
+                        <th>Jugador</th>
+                        <th>Posición</th>
+                        <th>Min.</th>
+                        <th>Goles</th>
+                        <th>Asist.</th>
+                        <th>Remates</th>
+                        <th>Pases</th>
+                        <th>Precisión</th>
+                        <th>Índice</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var jugador in Model.Estadisticas)
+                    {
+                        <tr>
+
+                            <td>
+                                <a class="pd-link"
+                                   asp-controller="Jugadores"
+                                   asp-action="Perfil"
+                                   asp-route-id="@jugador.JugadorId">
+                                    @jugador.Nombre
+                                </a>
+                            </td>
+
+                            <td>@jugador.Posicion</td>
+
+                            <td>@jugador.Minutos</td>
+
+                            <td>@jugador.Goles</td>
+
+                            <td>@jugador.Asistencias</td>
+
+                            <td>@jugador.Remates</td>
+
+                            <td>
+                                @jugador.PasesCompletados /
+                                @jugador.PasesIntentados
+                            </td>
+
+                            <td>
+                                @(jugador.PrecisionPases?.ToString("0.0") ?? "—")@(jugador.PrecisionPases.HasValue ? "%" : "")
+                            </td>
+
+                            <td>
+                                <span class="pd-pill">
+                                    @(jugador.IndiceRendimiento?.ToString("0.00") ?? "—")
+                                </span>
+                            </td>
+
+                            <td>
+                                <a class="pd-link"
+                                   asp-controller="Jugadores"
+                                   asp-action="DetallePartido"
+                                   asp-route-id="@jugador.JugadorId"
+                                   asp-route-partidoId="@Model.Id">
+
+                                    Ver análisis →
+
+                                </a>
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+
+</section>
+
+<p class="pd-note">
+    Los datos corresponden a los registros académicos de PostgreSQL.
+    Los enlaces permiten navegar al perfil del jugador y a su
+    análisis individual de este encuentro.
+</p>

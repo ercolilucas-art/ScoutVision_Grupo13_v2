@@ -1,0 +1,123 @@
+@model LoginViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Iniciar sesión";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iniciar sesión - ScoutVision</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="login-page">
+    <section class="login-hero">
+        <div class="hero-content">
+            <div class="brand brand-large">
+                <div class="brand-icon">SV</div>
+                <div>
+                    <div class="brand-name"><span>Scout</span><strong>Vision</strong></div>
+                    <div class="brand-tagline">ANÁLISIS QUE DESCUBRE TALENTO</div>
+                </div>
+            </div>
+
+            <div class="hero-copy">
+                <h1>El fútbol también<br /><span>se analiza</span></h1>
+                <p>
+                    Analiza jugadores, equipos y datos de rendimiento
+                    para descubrir talento, entender el juego y tomar
+                    mejores decisiones.
+                </p>
+
+                <div class="hero-features">
+                    <div class="feature">
+                        <div class="feature-icon">▥</div>
+                        <strong>Datos confiables</strong>
+                        <span>Estadísticas claras y centralizadas.</span>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">♟</div>
+                        <strong>Scouting profesional</strong>
+                        <span>Seguimiento de jugadores y equipos.</span>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">◎</div>
+                        <strong>Mejores decisiones</strong>
+                        <span>Información útil para el análisis.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-panel-wrap">
+            <div class="login-card">
+                <div class="login-card-brand">
+                    <div class="brand-icon small-icon">SV</div>
+                    <div class="brand-name"><span>Scout</span><strong>Vision</strong></div>
+                </div>
+
+                <h2>Iniciar sesión</h2>
+                <p class="login-subtitle">Accede a tu cuenta para continuar con el análisis.</p>
+
+                @if (TempData["RegisterSuccess"] is string registerSuccess)
+                {
+                    <div class="success-banner auth-success">
+                        <span>✓</span>
+                        <div><strong>@registerSuccess</strong></div>
+                    </div>
+                }
+
+                <form asp-action="Login" method="post" class="login-form">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="form-error"></div>
+
+                    <label asp-for="Username"></label>
+                    <div class="input-shell">
+                        <span class="input-icon">♙</span>
+                        <input asp-for="Username" autocomplete="username" placeholder="Ingresa tu usuario" />
+                    </div>
+                    <span asp-validation-for="Username" class="field-error"></span>
+
+                    <label asp-for="Password"></label>
+                    <div class="input-shell">
+                        <span class="input-icon">⌑</span>
+                        <input asp-for="Password" id="passwordInput" autocomplete="current-password" placeholder="Ingresa tu contraseña" />
+                        <button type="button" class="password-toggle" id="togglePassword">◉</button>
+                    </div>
+                    <span asp-validation-for="Password" class="field-error"></span>
+
+                    <div class="login-options">
+                        <label class="check-line">
+                            <input asp-for="RememberMe" />
+                            <span>Recordarme</span>
+                        </label>
+                        <span class="fake-link">¿Olvidaste tu contraseña?</span>
+                    </div>
+
+                    <button type="submit" class="primary-button">
+                        Ingresar <span>→</span>
+                    </button>
+                </form>
+
+                <div class="auth-switch">
+                    <span>¿Todavía no tenés cuenta?</span>
+                    <a asp-controller="Auth" asp-action="Register">Crear cuenta</a>
+                </div>
+
+                <div class="secure-note">
+                    <span>⌑</span>
+                    <div>
+                        <strong>Acceso protegido</strong>
+                        <p>Credenciales validadas contra PostgreSQL y contraseña almacenada con hash bcrypt.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="~/js/site.js"></script>
+</body>
+</html>

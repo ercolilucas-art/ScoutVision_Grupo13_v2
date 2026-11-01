@@ -1,0 +1,390 @@
+@model JugadoresIndexViewModel
+
+@{
+    ViewData["Title"] = "Jugadores";
+}
+
+<style>
+    /* Estilos locales. No modifica el CSS del resto del sistema. */
+
+    .jug-filter {
+        display: flex;
+        align-items: end;
+        flex-wrap: wrap;
+        gap: 14px;
+        padding: 20px 24px;
+        margin-bottom: 22px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+    }
+
+        .jug-filter label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #b9cad8;
+            margin-bottom: 8px;
+        }
+
+        .jug-filter input,
+        .jug-filter select {
+            width: 100%;
+            min-height: 44px;
+            padding: 0 12px;
+            color: #eef6fb;
+            background: #112639;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            outline: none;
+        }
+
+            .jug-filter input:focus,
+            .jug-filter select:focus {
+                border-color: var(--green);
+            }
+
+    .jug-field {
+        min-width: 180px;
+        flex: 1;
+    }
+
+    .jug-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .jug-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 16px;
+        border-radius: 10px;
+        background: var(--green);
+        color: #071b10;
+        font-weight: 800;
+        border: 0;
+        cursor: pointer;
+    }
+
+    .jug-clear {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 16px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        color: #d6e4ef;
+        text-decoration: none;
+    }
+
+    .jug-count {
+        padding: 18px 24px;
+        color: #a7bdcc;
+        font-size: 14px;
+    }
+
+    .jug-empty {
+        padding: 45px;
+        text-align: center;
+        color: #a7bdcc;
+    }
+
+    .jug-status-neutral {
+        color: #a7bdcc;
+        border-color: var(--line);
+        background: #132637;
+    }
+
+    .jug-note {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 18px;
+        line-height: 1.5;
+    }
+
+    /* Enlaces a los perfiles individuales */
+
+    .jug-player-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #eef6fb;
+        font-weight: 700;
+        text-decoration: none;
+        transition: color .2s ease;
+    }
+
+        .jug-player-link:hover {
+            color: #9fea58;
+        }
+
+        .jug-player-link:focus-visible {
+            outline: 2px solid #9fea58;
+            outline-offset: 4px;
+            border-radius: 3px;
+        }
+
+    .jug-player-arrow {
+        color: #9fea58;
+        font-size: 15px;
+        opacity: 0;
+        transform: translateX(-4px);
+        transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .jug-player-link:hover .jug-player-arrow,
+    .jug-player-link:focus-visible .jug-player-arrow {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    @@media (max-width: 640px) {
+        .jug-filter {
+            padding: 14px;
+        }
+
+        .jug-actions {
+            width: 100%;
+        }
+
+        .jug-button,
+        .jug-clear {
+            flex: 1;
+        }
+
+        .jug-player-arrow {
+            opacity: 1;
+            transform: none;
+        }
+    }
+</style>
+
+<!-- Encabezado -->
+
+<div class="page-header">
+    <div>
+        <h1>Jugadores <span>analizados</span></h1>
+        <p>Plantel, estadísticas de temporada y participación en partidos.</p>
+    </div>
+
+    <div class="season-chip">
+        Temporada 2026
+    </div>
+</div>
+
+<!-- Tarjetas de resumen -->
+
+<div class="summary-grid">
+
+    <div class="summary-card">
+        <div class="summary-icon">♙</div>
+        <div>
+            <h3>Jugadores</h3>
+            <strong>@Model.Jugadores.Count</strong>
+            <p>en la selección</p>
+        </div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-icon">♟</div>
+        <div>
+            <h3>Equipos</h3>
+            <strong>@Model.CantidadEquipos</strong>
+            <p>en la selección</p>
+        </div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-icon">▣</div>
+        <div>
+            <h3>Participaciones</h3>
+            <strong>@Model.Jugadores.Sum(j => j.Partidos)</strong>
+            <p>registros por partido</p>
+        </div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-icon">▥</div>
+        <div>
+            <h3>Índice promedio</h3>
+            <strong>@(Model.PromedioIndice?.ToString("0.0") ?? "—")</strong>
+            <p>rendimiento temporada</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Filtros de búsqueda -->
+
+<form asp-controller="Jugadores"
+      asp-action="Index"
+      method="get"
+      class="jug-filter">
+
+    <div class="jug-field">
+        <label for="busqueda">Buscar jugador o equipo</label>
+
+        <input id="busqueda"
+               name="busqueda"
+               value="@Model.Busqueda"
+               placeholder="Ej.: Paredes o Boca" />
+    </div>
+
+    <div class="jug-field">
+        <label for="equipoId">Filtrar por equipo</label>
+
+        <select id="equipoId" name="equipoId">
+
+            <option value="0">Todos los equipos</option>
+
+            @foreach (var equipo in Model.Equipos)
+            {
+                if (Model.EquipoId == equipo.Id)
+                {
+                    <option value="@equipo.Id" selected>
+                        @equipo.Nombre
+                    </option>
+                }
+                else
+                {
+                    <option value="@equipo.Id">
+                        @equipo.Nombre
+                    </option>
+                }
+            }
+
+        </select>
+    </div>
+
+    <div class="jug-actions">
+
+        <button class="jug-button" type="submit">
+            Aplicar filtros
+        </button>
+
+        <a class="jug-clear"
+           asp-controller="Jugadores"
+           asp-action="Index">
+            Limpiar
+        </a>
+
+    </div>
+
+</form>
+
+<!-- Listado de futbolistas -->
+
+<section class="table-panel">
+
+    <div class="table-heading">
+        <h2>Listado de futbolistas</h2>
+        <p>
+            Seleccioná el nombre de un jugador para consultar
+            su perfil y rendimiento por partido.
+        </p>
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="player-table">
+
+            <thead>
+                <tr>
+                    <th>Jugador</th>
+                    <th>Equipo</th>
+                    <th>Posición</th>
+                    <th>Edad</th>
+                    <th>Partidos</th>
+                    <th>Goles</th>
+                    <th>Asist.</th>
+                    <th>Minutos</th>
+                    <th>Índice</th>
+                    <th>Rendimiento</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var jugador in Model.Jugadores)
+                {
+                    <tr>
+
+                        <!-- Enlace al perfil individual -->
+
+                        <td>
+                            <a class="jug-player-link"
+                               asp-controller="Jugadores"
+                               asp-action="Perfil"
+                               asp-route-id="@jugador.Id"
+                               title="Ver perfil de @jugador.Nombre">
+
+                                <span>@jugador.Nombre</span>
+
+                                <span class="jug-player-arrow"
+                                      aria-hidden="true">
+                                    ↗
+                                </span>
+
+                            </a>
+                        </td>
+
+                        <td>@jugador.Equipo</td>
+
+                        <td>@jugador.Posicion</td>
+
+                        <td>
+                            @(jugador.Edad?.ToString() ?? "—")
+                        </td>
+
+                        <td>@jugador.Partidos</td>
+
+                        <td>@jugador.Goles</td>
+
+                        <td>@jugador.Asistencias</td>
+
+                        <td>@jugador.Minutos</td>
+
+                        <td class="index-cell">
+                            @(jugador.Indice?.ToString("0.0") ?? "—")
+                        </td>
+
+                        <td>
+                            <span class="status-pill @(jugador.Indice.HasValue? jugador.ClaseEstado: "jug-status-neutral")">
+
+                                <span class="status-dot"></span>
+
+                                @jugador.Estado
+
+                            </span>
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+        @if (!Model.Jugadores.Any())
+        {
+            <div class="jug-empty">
+                No encontramos jugadores con esos filtros.
+            </div>
+        }
+
+    </div>
+
+    <div class="jug-count">
+        Se muestran @Model.Jugadores.Count jugadores.
+    </div>
+
+</section>
+
+<p class="jug-note">
+    Los números de rendimiento utilizados son datos de demostración académica.
+    Los partidos contabilizados corresponden a registros existentes en
+    player_match_stats.
+</p>

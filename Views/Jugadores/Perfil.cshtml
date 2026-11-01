@@ -1,0 +1,370 @@
+﻿@using ScoutVision.Web.Models
+
+@{
+    ViewData["Title"] = "Perfil del jugador";
+
+    string nombre = ViewBag.Nombre ?? "Jugador";
+    string equipo = ViewBag.Equipo ?? "Sin equipo";
+
+    var partidos = ViewBag.PartidosJugador as List<PartidoJugadorViewModel>
+        ?? new List<PartidoJugadorViewModel>();
+
+    // Identificador del jugador para navegar al detalle.
+    string jugadorId = ViewContext.RouteData.Values["id"]?.ToString()
+        ?? Context.Request.Query["id"].ToString();
+}
+
+<style>
+    /* Navegación */
+
+    .perfil-volver {
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 24px;
+        color: #9fea58;
+        font-weight: 700;
+        text-decoration: none;
+        transition: opacity .2s;
+    }
+
+        .perfil-volver:hover {
+            opacity: .75;
+        }
+
+    /* Tarjetas */
+
+    .perfil-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 28px;
+        margin-top: 24px;
+    }
+
+        .perfil-card h2 {
+            margin: 0 0 20px;
+            font-size: 20px;
+            color: #eef6fb;
+        }
+
+    /* Información del jugador */
+
+    .perfil-dato {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--line);
+        gap: 20px;
+    }
+
+        .perfil-dato:last-child {
+            border-bottom: none;
+        }
+
+        .perfil-dato span {
+            color: #a7bdcc;
+            font-size: 14px;
+        }
+
+        .perfil-dato strong {
+            color: #eef6fb;
+            font-size: 14px;
+            text-align: right;
+        }
+
+    /* Tabla de rendimiento */
+
+    .perfil-tabla-contenedor {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+    }
+
+    .perfil-tabla {
+        width: 100%;
+        min-width: 980px;
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+        .perfil-tabla thead {
+            background: rgba(255, 255, 255, .045);
+        }
+
+        .perfil-tabla th {
+            padding: 16px 14px;
+            color: #a7bdcc;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: left;
+            text-transform: uppercase;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .perfil-tabla td {
+            padding: 17px 14px;
+            color: #eef6fb;
+            font-size: 13px;
+            border-bottom: 1px solid var(--line);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .perfil-tabla tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .perfil-tabla tbody tr:hover {
+            background: rgba(255, 255, 255, .035);
+        }
+
+        .perfil-tabla th:nth-child(2),
+        .perfil-tabla td:nth-child(2) {
+            min-width: 250px;
+        }
+
+    /* Resultado */
+
+    .perfil-resultado {
+        display: inline-block;
+        padding: 6px 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-weight: 700;
+        color: #eef6fb;
+    }
+
+    /* Índice de rendimiento */
+
+    .perfil-indice {
+        display: inline-block;
+        padding: 7px 12px;
+        background: rgba(159, 234, 88, .1);
+        color: #9fea58;
+        border: 1px solid rgba(159, 234, 88, .2);
+        border-radius: 8px;
+        font-weight: 700;
+    }
+
+    /* Enlace al detalle del partido */
+
+    .perfil-detalle-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 9px 13px;
+        color: #9fea58;
+        background: rgba(159, 234, 88, .08);
+        border: 1px solid rgba(159, 234, 88, .25);
+        border-radius: 9px;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background .2s, border-color .2s;
+    }
+
+        .perfil-detalle-link:hover {
+            background: rgba(159, 234, 88, .16);
+            border-color: #9fea58;
+            color: #9fea58;
+        }
+
+        .perfil-detalle-link:focus-visible {
+            outline: 2px solid #9fea58;
+            outline-offset: 3px;
+        }
+
+    .perfil-sin-datos {
+        color: #a7bdcc;
+        font-size: 14px;
+        padding: 16px 0;
+    }
+
+    .perfil-tabla-contenedor::-webkit-scrollbar {
+        height: 7px;
+    }
+
+    .perfil-tabla-contenedor::-webkit-scrollbar-thumb {
+        background: #354b5b;
+        border-radius: 8px;
+    }
+
+    @@media (max-width: 640px) {
+        .perfil-card {
+            padding: 18px;
+        }
+
+        .perfil-dato {
+            gap: 12px;
+        }
+    }
+</style>
+
+<!-- Navegación -->
+
+<a class="perfil-volver"
+   asp-controller="Jugadores"
+   asp-action="Index">
+    ← Volver a jugadores
+</a>
+
+<!-- Encabezado -->
+
+<div class="page-header">
+    <div>
+        <h1>@nombre</h1>
+        <p>Ficha individual y análisis de rendimiento.</p>
+    </div>
+
+    <div class="season-chip">
+        Temporada 2026
+    </div>
+</div>
+
+<!-- Información general -->
+
+<section class="perfil-card">
+
+    <h2>Información del jugador</h2>
+
+    <div class="perfil-dato">
+        <span>Nombre completo</span>
+        <strong>@nombre</strong>
+    </div>
+
+    <div class="perfil-dato">
+        <span>Equipo actual registrado</span>
+        <strong>@equipo</strong>
+    </div>
+
+    <div class="perfil-dato">
+        <span>Posición</span>
+        <strong>@ViewBag.Posicion</strong>
+    </div>
+
+    <div class="perfil-dato">
+        <span>Edad</span>
+        <strong>@ViewBag.Edad</strong>
+    </div>
+
+    <div class="perfil-dato">
+        <span>Partidos registrados</span>
+        <strong>@ViewBag.Partidos</strong>
+    </div>
+
+    <div class="perfil-dato">
+        <span>Goles</span>
+        <strong>@ViewBag.Goles</strong>
+    </div>
+
+    <div class="perfil-dato">
+        <span>Asistencias</span>
+        <strong>@ViewBag.Asistencias</strong>
+    </div>
+
+    <div class="perfil-dato">
+        <span>Minutos jugados</span>
+        <strong>@ViewBag.Minutos</strong>
+    </div>
+
+    <div class="perfil-dato">
+        <span>Índice de rendimiento</span>
+        <strong>@ViewBag.Indice</strong>
+    </div>
+
+</section>
+
+<!-- Rendimiento por partido -->
+
+<section class="perfil-card">
+
+    <h2>Rendimiento por partido</h2>
+
+    @if (partidos.Count == 0)
+    {
+        <p class="perfil-sin-datos">
+            No hay partidos registrados para este jugador.
+        </p>
+    }
+    else
+    {
+        <div class="perfil-tabla-contenedor">
+
+            <table class="perfil-tabla">
+
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Partido</th>
+                        <th>Resultado</th>
+                        <th>Min.</th>
+                        <th>Goles</th>
+                        <th>Asist.</th>
+                        <th>Remates</th>
+                        <th>Índice</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var partido in partidos)
+                    {
+                        <tr>
+                            <td>
+                                @partido.Fecha.ToString("dd/MM/yyyy")
+                            </td>
+
+                            <td>
+                                @partido.EquipoLocal vs @partido.EquipoVisitante
+                            </td>
+
+                            <td>
+                                <span class="perfil-resultado">
+                                    @partido.GolesLocal - @partido.GolesVisitante
+                                </span>
+                            </td>
+
+                            <td>@partido.Minutos</td>
+
+                            <td>@partido.Goles</td>
+
+                            <td>@partido.Asistencias</td>
+
+                            <td>@partido.Remates</td>
+
+                            <td>
+                                <span class="perfil-indice">
+                                    @(partido.IndiceRendimiento?.ToString("0.00") ?? "—")
+                                </span>
+                            </td>
+
+                            <!-- Drill Down al tercer nivel -->
+
+                            <td>
+                                <a class="perfil-detalle-link"
+                                   asp-controller="Jugadores"
+                                   asp-action="DetallePartido"
+                                   asp-route-id="@jugadorId"
+                                   asp-route-partidoId="@partido.PartidoId"
+                                   aria-label="Ver detalle de @partido.EquipoLocal contra @partido.EquipoVisitante">
+                                    Ver detalle
+                                    <span aria-hidden="true">↗</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+
+</section>

@@ -1,0 +1,585 @@
+@model HomeViewModel
+
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<style>
+    /* =========================================
+           SCOUTVISION - DASHBOARD DE INICIO
+           ========================================= */
+
+    .home-intro {
+        margin-bottom: 26px;
+    }
+
+        .home-intro p {
+            color: #a7bdcc;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-top: 10px;
+        }
+
+    /* Indicadores generales */
+
+    .home-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 32px;
+    }
+
+    .home-metric {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 25px;
+        min-width: 0;
+        transition: border-color .2s;
+    }
+
+        .home-metric:hover {
+            border-color: rgba(159, 234, 88, .35);
+        }
+
+    .home-metric-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        background: rgba(159, 234, 88, .10);
+        color: #9fea58;
+        font-size: 24px;
+    }
+
+    .home-metric-label {
+        display: block;
+        color: #a7bdcc;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .home-metric-value {
+        display: block;
+        color: #eef6fb;
+        font-size: 36px;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .home-metric-desc {
+        display: block;
+        color: #849aaa;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+
+    /* Encabezados de secciones */
+
+    .home-section {
+        margin-bottom: 30px;
+    }
+
+    .home-section-header {
+        margin-bottom: 20px;
+    }
+
+        .home-section-header h2 {
+            color: #eef6fb;
+            font-size: 22px;
+            font-weight: 800;
+            margin: 0 0 8px;
+        }
+
+        .home-section-header p {
+            color: #a7bdcc;
+            font-size: 14px;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+    /* Módulos */
+
+    .home-modules {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .home-module {
+        display: flex;
+        flex-direction: column;
+        min-height: 225px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 24px;
+        text-decoration: none;
+        transition: border-color .2s, transform .2s, background .2s;
+    }
+
+        .home-module:hover {
+            border-color: rgba(159, 234, 88, .5);
+            transform: translateY(-3px);
+            background: #152c3e;
+        }
+
+    .home-module-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: rgba(159, 234, 88, .09);
+        border: 1px solid rgba(159, 234, 88, .15);
+        color: #9fea58;
+        font-size: 23px;
+        margin-bottom: 18px;
+    }
+
+    .home-module h3 {
+        color: #eef6fb;
+        font-size: 18px;
+        font-weight: 800;
+        margin: 0 0 10px;
+    }
+
+    .home-module p {
+        color: #a7bdcc;
+        font-size: 13px;
+        line-height: 1.6;
+        margin: 0 0 20px;
+    }
+
+    .home-module-link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        color: #9fea58;
+        font-size: 13px;
+        font-weight: 800;
+        margin-top: auto;
+    }
+
+        .home-module-link span:last-child {
+            font-size: 18px;
+            transition: transform .2s;
+        }
+
+    .home-module:hover .home-module-link span:last-child {
+        transform: translateX(4px);
+    }
+
+    .home-module:focus-visible {
+        outline: 2px solid #9fea58;
+        outline-offset: 3px;
+    }
+
+    /* Información del sistema */
+
+    .home-info {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 26px;
+        margin-top: 32px;
+    }
+
+    .home-info-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 18px;
+    }
+
+    .home-info-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 11px;
+        background: rgba(159, 234, 88, .09);
+        color: #9fea58;
+        font-size: 22px;
+    }
+
+    .home-info h2 {
+        color: #eef6fb;
+        font-size: 19px;
+        margin: 0;
+    }
+
+    .home-info p {
+        color: #a7bdcc;
+        font-size: 13px;
+        line-height: 1.8;
+        margin: 0;
+    }
+
+    .home-info-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 20px;
+    }
+
+    .home-info-tag {
+        display: inline-block;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: #b9cad8;
+        background: rgba(255, 255, 255, .025);
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    /* Responsive */
+
+    @@media (max-width: 1050px) {
+        .home-modules {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 720px) {
+        .home-metrics {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .home-modules {
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        .home-metric {
+            padding: 20px;
+        }
+
+        .home-module {
+            min-height: 190px;
+            padding: 20px;
+        }
+
+        .home-info {
+            padding: 20px;
+        }
+    }
+</style>
+
+<!-- =========================================
+     ENCABEZADO
+     ========================================= -->
+
+<div class="page-header home-intro">
+
+    <div>
+        <h1>Bienvenido, <span>@Model.Username</span></h1>
+
+        <p>
+            Panel general de ScoutVision.
+            Explorá futbolistas, equipos, partidos y
+            estadísticas de rendimiento desde un mismo lugar.
+        </p>
+    </div>
+
+    <div class="season-chip">
+        Temporada 2026
+    </div>
+
+</div>
+
+<!-- Mensaje de inicio de sesión -->
+@if (TempData["LoginSuccess"] is string success)
+{
+    <div class="success-banner">
+        <span>✓</span>
+
+        <div>
+            <strong>@success</strong>
+            <p>Sesión iniciada correctamente.</p>
+        </div>
+    </div>
+}
+
+<!-- =========================================
+     INDICADORES GENERALES
+     ========================================= -->
+
+<section class="home-section">
+
+    <div class="home-section-header">
+        <h2>Resumen general</h2>
+
+        <p>
+            Información actual de los registros
+            almacenados en PostgreSQL.
+        </p>
+    </div>
+
+    <div class="home-metrics">
+
+        <!-- Jugadores -->
+
+        <div class="home-metric">
+
+            <div class="home-metric-icon">♙</div>
+
+            <span class="home-metric-label">
+                Jugadores registrados
+            </span>
+
+            <strong class="home-metric-value">
+                @Model.Players
+            </strong>
+
+            <span class="home-metric-desc">
+                Futbolistas disponibles para análisis
+            </span>
+
+        </div>
+
+        <!-- Equipos -->
+
+        <div class="home-metric">
+
+            <div class="home-metric-icon">♟</div>
+
+            <span class="home-metric-label">
+                Equipos registrados
+            </span>
+
+            <strong class="home-metric-value">
+                @Model.Teams
+            </strong>
+
+            <span class="home-metric-desc">
+                Clubes con información disponible
+            </span>
+
+        </div>
+
+        <!-- Partidos -->
+
+        <div class="home-metric">
+
+            <div class="home-metric-icon">▣</div>
+
+            <span class="home-metric-label">
+                Partidos registrados
+            </span>
+
+            <strong class="home-metric-value">
+                @Model.Matches
+            </strong>
+
+            <span class="home-metric-desc">
+                Encuentros cargados en el sistema
+            </span>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================================
+     ACCESOS A LOS MODULOS
+     ========================================= -->
+
+<section class="home-section">
+
+    <div class="home-section-header">
+
+        <h2>Módulos de análisis</h2>
+
+        <p>
+            Accedé a las distintas herramientas
+            de exploración y análisis de ScoutVision.
+        </p>
+
+    </div>
+
+    <div class="home-modules">
+
+        <!-- Jugadores -->
+
+        <a class="home-module"
+           asp-controller="Jugadores"
+           asp-action="Index">
+
+            <div class="home-module-icon">♙</div>
+
+            <h3>Jugadores</h3>
+
+            <p>
+                Consultá futbolistas, utilizá filtros
+                por equipo y accedé a sus perfiles,
+                estadísticas y rendimiento por partido.
+            </p>
+
+            <div class="home-module-link">
+                <span>Explorar jugadores</span>
+                <span>→</span>
+            </div>
+
+        </a>
+
+        <!-- Equipos -->
+
+        <a class="home-module"
+           asp-controller="Equipos"
+           asp-action="Index">
+
+            <div class="home-module-icon">♟</div>
+
+            <h3>Equipos</h3>
+
+            <p>
+                Explorá los clubes registrados
+                y consultá sus planteles con acceso
+                directo a las fichas individuales.
+            </p>
+
+            <div class="home-module-link">
+                <span>Explorar equipos</span>
+                <span>→</span>
+            </div>
+
+        </a>
+
+        <!-- Partidos -->
+
+        <a class="home-module"
+           asp-controller="Partidos"
+           asp-action="Index">
+
+            <div class="home-module-icon">▣</div>
+
+            <h3>Partidos</h3>
+
+            <p>
+                Revisá encuentros, resultados,
+                estadísticas individuales y análisis
+                de rendimiento de los futbolistas.
+            </p>
+
+            <div class="home-module-link">
+                <span>Explorar partidos</span>
+                <span>→</span>
+            </div>
+
+        </a>
+
+        <!-- Semaforización -->
+
+        <a class="home-module"
+           asp-controller="Semaforizacion"
+           asp-action="Index">
+
+            <div class="home-module-icon">▥</div>
+
+            <h3>Semaforización</h3>
+
+            <p>
+                Identificá futbolistas mediante
+                indicadores visuales de rendimiento
+                y categorías de colores.
+            </p>
+
+            <div class="home-module-link">
+                <span>Ver semaforización</span>
+                <span>→</span>
+            </div>
+
+        </a>
+
+        <!-- Reportes -->
+
+        <a class="home-module"
+           asp-controller="Reportes"
+           asp-action="Index">
+
+            <div class="home-module-icon">▤</div>
+
+            <h3>Reportes</h3>
+
+            <p>
+                Analizá rankings, indicadores,
+                gráficos comparativos y exportá
+                los resultados a CSV.
+            </p>
+
+            <div class="home-module-link">
+                <span>Consultar reportes</span>
+                <span>→</span>
+            </div>
+
+        </a>
+
+    </div>
+
+</section>
+
+<!-- =========================================
+     INFORMACIÓN DEL SISTEMA
+     ========================================= -->
+
+<section class="home-info">
+
+    <div class="home-info-header">
+
+        <div class="home-info-icon">▥</div>
+
+        <h2>Acerca de ScoutVision</h2>
+
+    </div>
+
+    <p>
+        ScoutVision es un sistema de análisis y exploración
+        de información futbolística. Permite consultar
+        jugadores, equipos y encuentros registrados,
+        comparar estadísticas de rendimiento y acceder
+        a información detallada mediante navegación
+        Drill Down y Drill Up.
+
+        <br />
+
+        La información se obtiene mediante consultas SQL
+        directas a una base de datos PostgreSQL.
+        Los registros deportivos utilizados actualmente
+        corresponden a datos de demostración académica.
+    </p>
+
+    <div class="home-info-tags">
+
+        <span class="home-info-tag">
+            PostgreSQL
+        </span>
+
+        <span class="home-info-tag">
+            ASP.NET Core MVC
+        </span>
+
+        <span class="home-info-tag">
+            C#
+        </span>
+
+        <span class="home-info-tag">
+            Consultas SQL
+        </span>
+
+        <span class="home-info-tag">
+            Drill Down / Drill Up
+        </span>
+
+    </div>
+
+</section>

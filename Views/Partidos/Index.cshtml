@@ -1,0 +1,374 @@
+﻿@model ScoutVision.Web.Models.PartidosIndexViewModel
+
+@{
+    ViewData["Title"] = "Partidos";
+}
+
+<style>
+    /* Filtros */
+
+    .part-filter {
+        display: flex;
+        align-items: end;
+        gap: 12px;
+        flex-wrap: wrap;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin: 24px 0;
+    }
+
+    .part-field {
+        flex: 1;
+        min-width: 200px;
+    }
+
+        .part-field label {
+            display: block;
+            color: #b9cad8;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .part-field select {
+            width: 100%;
+            min-height: 44px;
+            padding: 0 12px;
+            background: #112639;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            color: #eef6fb;
+        }
+
+    .part-btn {
+        min-height: 44px;
+        padding: 0 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--green);
+        border: 0;
+        border-radius: 10px;
+        color: #071b10;
+        font-weight: 800;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+        .part-btn:hover {
+            opacity: .85;
+            color: #071b10;
+        }
+
+    .part-clear {
+        background: transparent;
+        color: #eef6fb;
+        border: 1px solid var(--line);
+    }
+
+        .part-clear:hover {
+            color: #eef6fb;
+        }
+
+    /* Estadísticas generales */
+
+    .part-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 26px;
+    }
+
+    .part-summary {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px;
+    }
+
+        .part-summary span {
+            display: block;
+            color: #a7bdcc;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .part-summary strong {
+            color: #eef6fb;
+            font-size: 30px;
+        }
+
+    /* Tarjetas de partidos */
+
+    .part-list {
+        display: grid;
+        gap: 16px;
+    }
+
+    .part-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px;
+        display: grid;
+        gap: 18px;
+        transition: border-color .2s;
+    }
+
+        .part-card:hover {
+            border-color: rgba(159, 234, 88, .4);
+        }
+
+    .part-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        color: #a7bdcc;
+        font-size: 13px;
+    }
+
+    .part-match {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        align-items: center;
+        gap: 16px;
+        text-align: center;
+    }
+
+    .part-team {
+        color: #eef6fb;
+        font-size: 18px;
+        font-weight: 750;
+        overflow-wrap: anywhere;
+    }
+
+    .part-score {
+        color: #9fea58;
+        font-weight: 850;
+        font-size: 30px;
+        white-space: nowrap;
+    }
+
+    .part-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        padding-top: 15px;
+        border-top: 1px solid var(--line);
+    }
+
+        .part-foot span {
+            color: #a7bdcc;
+            font-size: 13px;
+        }
+
+    .part-empty {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 35px;
+        color: #a7bdcc;
+        text-align: center;
+    }
+
+    .part-note {
+        font-size: 13px;
+        color: #a7bdcc;
+        margin-top: 20px;
+        line-height: 1.6;
+    }
+
+    @@media (max-width: 700px) {
+        .part-team {
+            font-size: 14px;
+        }
+
+        .part-score {
+            font-size: 24px;
+        }
+
+        .part-card {
+            padding: 18px;
+        }
+
+        .part-match {
+            gap: 8px;
+        }
+
+        .part-filter {
+            padding: 16px;
+        }
+
+        .part-foot .part-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- Encabezado -->
+
+<div class="page-header">
+    <div>
+        <h1>Partidos <span>registrados</span></h1>
+        <p>
+            Resultados, encuentros y estadísticas individuales
+            de ScoutVision.
+        </p>
+    </div>
+
+    <div class="season-chip">
+        Temporada 2026
+    </div>
+</div>
+
+<!-- Resumen -->
+
+<div class="part-grid">
+
+    <div class="part-summary">
+        <span>Partidos encontrados</span>
+        <strong>@Model.Partidos.Count</strong>
+    </div>
+
+    <div class="part-summary">
+        <span>Participaciones con estadísticas</span>
+        <strong>@Model.TotalParticipaciones</strong>
+    </div>
+
+</div>
+
+<!-- Filtro por equipo -->
+
+<form class="part-filter"
+      method="get"
+      asp-controller="Partidos"
+      asp-action="Index">
+
+    <div class="part-field">
+
+        <label for="equipoId">
+            Filtrar encuentros por equipo
+        </label>
+
+        <select id="equipoId" name="equipoId">
+
+            @if (Model.EquipoId == 0)
+            {
+                <option value="0" selected>Todos los equipos</option>
+            }
+            else
+            {
+                <option value="0">Todos los equipos</option>
+            }
+
+            @foreach (var equipo in Model.Equipos)
+            {
+                if (Model.EquipoId == equipo.Id)
+                {
+                    <option value="@equipo.Id" selected>
+                        @equipo.Nombre
+                    </option>
+                }
+                else
+                {
+                    <option value="@equipo.Id">
+                        @equipo.Nombre
+                    </option>
+                }
+            }
+
+        </select>
+
+    </div>
+
+    <button class="part-btn" type="submit">
+        Aplicar filtro
+    </button>
+
+    <a class="part-btn part-clear"
+       asp-controller="Partidos"
+       asp-action="Index">
+        Limpiar
+    </a>
+
+</form>
+
+<!-- Partidos -->
+@if (Model.Partidos.Count == 0)
+{
+    <div class="part-empty">
+        No hay encuentros registrados para este filtro.
+    </div>
+}
+else
+{
+    <div class="part-list">
+
+        @foreach (var partido in Model.Partidos)
+        {
+            <article class="part-card">
+
+                <div class="part-meta">
+
+                    <span>
+                        @partido.Fecha.ToString("dd/MM/yyyy")
+                    </span>
+
+                    <span>
+                        Partido #@partido.Id
+                    </span>
+
+                </div>
+
+                <div class="part-match">
+
+                    <div class="part-team">
+                        @partido.EquipoLocal
+                    </div>
+
+                    <div class="part-score">
+                        @(partido.GolesLocal?.ToString() ?? "—")
+                        -
+                        @(partido.GolesVisitante?.ToString() ?? "—")
+                    </div>
+
+                    <div class="part-team">
+                        @partido.EquipoVisitante
+                    </div>
+
+                </div>
+
+                <div class="part-foot">
+
+                    <span>
+                        @partido.JugadoresConEstadisticas
+                        jugadores con estadísticas cargadas
+                    </span>
+
+                    <a class="part-btn"
+                       asp-controller="Partidos"
+                       asp-action="Detalle"
+                       asp-route-id="@partido.Id">
+
+                        Ver detalle →
+
+                    </a>
+
+                </div>
+
+            </article>
+        }
+
+    </div>
+}
+
+<p class="part-note">
+    Los resultados y estadísticas corresponden a los registros
+    académicos cargados en PostgreSQL.
+</p>
+

@@ -1,0 +1,305 @@
+﻿@{
+    ViewData["Title"] = "Detalle del partido";
+}
+
+<style>
+    /* Navegación */
+
+    .detalle-volver {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 24px;
+        color: #9fea58;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+        .detalle-volver:hover {
+            opacity: .8;
+        }
+
+    /* Tarjeta principal */
+
+    .detalle-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 28px;
+        margin-top: 24px;
+    }
+
+        .detalle-card h2 {
+            margin: 0 0 24px;
+            color: #eef6fb;
+            font-size: 20px;
+        }
+
+    /* Resultado del encuentro */
+
+    .detalle-partido {
+        text-align: center;
+        padding: 32px 20px;
+        background: rgba(255, 255, 255, .025);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+    }
+
+    .detalle-fecha {
+        color: #a7bdcc;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .detalle-marcador {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 35px;
+        flex-wrap: wrap;
+    }
+
+    .detalle-equipo {
+        flex: 1;
+        min-width: 150px;
+        max-width: 300px;
+        font-size: 19px;
+        font-weight: 700;
+        color: #eef6fb;
+    }
+
+    .detalle-resultado {
+        font-size: 36px;
+        font-weight: 800;
+        color: #9fea58;
+        white-space: nowrap;
+    }
+
+    /* Estadísticas */
+
+    .detalle-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .detalle-stat {
+        padding: 22px 18px;
+        background: rgba(255, 255, 255, .025);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        min-width: 0;
+    }
+
+    .detalle-stat-label {
+        display: block;
+        color: #a7bdcc;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .detalle-stat-value {
+        display: block;
+        color: #eef6fb;
+        font-size: 26px;
+        font-weight: 800;
+    }
+
+    .detalle-stat.destacado {
+        border-color: rgba(159, 234, 88, .3);
+        background: rgba(159, 234, 88, .06);
+    }
+
+        .detalle-stat.destacado .detalle-stat-value {
+            color: #9fea58;
+        }
+
+    .detalle-nota {
+        margin-top: 20px;
+        color: #a7bdcc;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    /* Responsive */
+
+    @@media (max-width: 1000px) {
+        .detalle-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .detalle-card {
+            padding: 18px;
+        }
+
+        .detalle-marcador {
+            gap: 16px;
+        }
+
+        .detalle-equipo {
+            min-width: 100px;
+            font-size: 15px;
+        }
+
+        .detalle-resultado {
+            font-size: 28px;
+        }
+
+        .detalle-stat {
+            padding: 16px;
+        }
+
+        .detalle-stat-value {
+            font-size: 22px;
+        }
+    }
+</style>
+
+<!-- Volver al perfil -->
+
+<a class="detalle-volver"
+   asp-controller="Jugadores"
+   asp-action="Perfil"
+   asp-route-id="@ViewBag.JugadorId">
+    ← Volver al perfil del jugador
+</a>
+
+<!-- Encabezado -->
+
+<div class="page-header">
+    <div>
+        <h1>Detalle <span>del partido</span></h1>
+        <p>
+            Rendimiento individual de @ViewBag.Jugador
+        </p>
+    </div>
+
+    <div class="season-chip">
+        Temporada 2026
+    </div>
+</div>
+
+<!-- Encuentro -->
+
+<section class="detalle-card">
+
+    <h2>Información del encuentro</h2>
+
+    <div class="detalle-partido">
+
+        <div class="detalle-fecha">
+            @ViewBag.Fecha
+        </div>
+
+        <div class="detalle-marcador">
+
+            <div class="detalle-equipo">
+                @ViewBag.EquipoLocal
+            </div>
+
+            <div class="detalle-resultado">
+                @ViewBag.GolesLocal - @ViewBag.GolesVisitante
+            </div>
+
+            <div class="detalle-equipo">
+                @ViewBag.EquipoVisitante
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- Rendimiento individual -->
+
+<section class="detalle-card">
+
+    <h2>Estadísticas de @ViewBag.Jugador</h2>
+
+    <div class="detalle-stats">
+
+        <div class="detalle-stat">
+            <span class="detalle-stat-label">
+                Minutos jugados
+            </span>
+            <strong class="detalle-stat-value">
+                @ViewBag.Minutos
+            </strong>
+        </div>
+
+        <div class="detalle-stat">
+            <span class="detalle-stat-label">
+                Goles
+            </span>
+            <strong class="detalle-stat-value">
+                @ViewBag.Goles
+            </strong>
+        </div>
+
+        <div class="detalle-stat">
+            <span class="detalle-stat-label">
+                Asistencias
+            </span>
+            <strong class="detalle-stat-value">
+                @ViewBag.Asistencias
+            </strong>
+        </div>
+
+        <div class="detalle-stat">
+            <span class="detalle-stat-label">
+                Remates
+            </span>
+            <strong class="detalle-stat-value">
+                @ViewBag.Remates
+            </strong>
+        </div>
+
+        <div class="detalle-stat">
+            <span class="detalle-stat-label">
+                Pases completados
+            </span>
+            <strong class="detalle-stat-value">
+                @ViewBag.PasesCompletados
+            </strong>
+        </div>
+
+        <div class="detalle-stat">
+            <span class="detalle-stat-label">
+                Pases intentados
+            </span>
+            <strong class="detalle-stat-value">
+                @ViewBag.PasesIntentados
+            </strong>
+        </div>
+
+        <div class="detalle-stat">
+            <span class="detalle-stat-label">
+                Precisión de pases
+            </span>
+            <strong class="detalle-stat-value">
+                @ViewBag.PrecisionPases
+            </strong>
+        </div>
+
+        <div class="detalle-stat destacado">
+            <span class="detalle-stat-label">
+                Índice de rendimiento
+            </span>
+            <strong class="detalle-stat-value">
+                @ViewBag.Indice
+            </strong>
+        </div>
+
+    </div>
+
+    <p class="detalle-nota">
+        Estadísticas obtenidas de PostgreSQL mediante consultas SQL.
+        Los valores corresponden a los registros académicos
+        disponibles para este encuentro.
+    </p>
+
+</section>
+

@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ScoutVision .NET",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "ScoutVision: build",
+      "program": "${workspaceFolder}/bin/Debug/net8.0/ScoutVision.Web.dll",
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      }
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+@model RegisterViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Crear cuenta";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crear cuenta - ScoutVision</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="login-page">
+    <section class="login-hero register-hero">
+        <div class="hero-content">
+            <div class="brand brand-large">
+                <div class="brand-icon">SV</div>
+                <div>
+                    <div class="brand-name"><span>Scout</span><strong>Vision</strong></div>
+                    <div class="brand-tagline">ANÁLISIS QUE DESCUBRE TALENTO</div>
+                </div>
+            </div>
+
+            <div class="hero-copy register-copy">
+                <h1>Creá tu cuenta<br /><span>de analista</span></h1>
+                <p>
+                    Registrate con tu correo, elegí un nombre de usuario y creá una contraseña segura.
+                    Ese nombre de usuario será el que aparezca en tu panel de inicio.
+                </p>
+            </div>
+        </div>
+
+        <div class="login-panel-wrap">
+            <div class="login-card register-card">
+                <div class="login-card-brand">
+                    <div class="brand-icon small-icon">SV</div>
+                    <div class="brand-name"><span>Scout</span><strong>Vision</strong></div>
+                </div>
+
+                <h2>Crear cuenta</h2>
+                <p class="login-subtitle">Completá tus datos para registrarte.</p>
+
+                <form asp-action="Register" method="post" class="login-form">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="form-error"></div>
+
+                    <label asp-for="Email"></label>
+                    <div class="input-shell">
+                        <span class="input-icon">@@</span>
+                        <input asp-for="Email" autocomplete="email" placeholder="nombre@correo.com" />
+                    </div>
+                    <span asp-validation-for="Email" class="field-error"></span>
+
+                    <label asp-for="Username"></label>
+                    <div class="input-shell">
+                        <span class="input-icon">♙</span>
+                        <input asp-for="Username" autocomplete="username" placeholder="Elegí tu usuario" />
+                    </div>
+                    <span asp-validation-for="Username" class="field-error"></span>
+
+                    <label asp-for="Password"></label>
+                    <div class="input-shell">
+                        <span class="input-icon">⌑</span>
+                        <input asp-for="Password" id="registerPassword" autocomplete="new-password" placeholder="Mínimo 8 caracteres" />
+                    </div>
+                    <span asp-validation-for="Password" class="field-error"></span>
+
+                    <label asp-for="ConfirmPassword"></label>
+                    <div class="input-shell">
+                        <span class="input-icon">⌑</span>
+                        <input asp-for="ConfirmPassword" autocomplete="new-password" placeholder="Repetí tu contraseña" />
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="field-error"></span>
+
+                    <button type="submit" class="primary-button">Crear cuenta <span>→</span></button>
+                </form>
+
+                <div class="auth-switch">
+                    <span>¿Ya tenés una cuenta?</span>
+                    <a asp-controller="Auth" asp-action="Login">Iniciar sesión</a>
+                </div>
+
+                <div class="secure-note">
+                    <span>⌑</span>
+                    <div>
+                        <strong>Contraseña protegida</strong>
+                        <p>La contraseña se almacena con hash bcrypt mediante PostgreSQL pgcrypto.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

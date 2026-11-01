@@ -1,0 +1,87 @@
+@model IReadOnlyList<PlayerTrafficLightViewModel>
+@{
+    ViewData["Title"] = "Semaforización";
+}
+
+<div class="page-header">
+    <div>
+        <h1>Semaforización <span>de rendimiento</span></h1>
+        <p>Clasificación visual de jugadores según su índice de rendimiento.</p>
+    </div>
+    <div class="season-chip">Temporada 2026</div>
+</div>
+
+<div class="traffic-summary">
+    <article class="traffic-card high">
+        <div class="traffic-light"></div>
+        <div>
+            <h2>Alto</h2>
+            <p>Rendimiento superior al promedio esperado.</p>
+        </div>
+    </article>
+
+    <article class="traffic-card medium">
+        <div class="traffic-light"></div>
+        <div>
+            <h2>Medio</h2>
+            <p>Rendimiento dentro de parámetros aceptables.</p>
+        </div>
+    </article>
+
+    <article class="traffic-card low">
+        <div class="traffic-light"></div>
+        <div>
+            <h2>Bajo</h2>
+            <p>Rendimiento por debajo del nivel esperado.</p>
+        </div>
+    </article>
+</div>
+
+<section class="table-panel">
+    <div class="table-heading">
+        <div>
+            <h2>Jugadores analizados</h2>
+            <p>Los datos se obtienen directamente desde PostgreSQL.</p>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="player-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Jugador</th>
+                    <th>Posición</th>
+                    <th>Equipo</th>
+                    <th>Índice</th>
+                    <th>Semaforización</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var player in Model)
+                {
+                    <tr>
+                        <td>@player.Id</td>
+                        <td><strong>@player.Player</strong></td>
+                        <td>@player.Position</td>
+                        <td>@player.Team</td>
+                        <td class="index-cell">@player.PerformanceIndex.ToString("0.0")</td>
+                        <td>
+                            <span class="status-pill @player.StatusCss">
+                                <span class="status-dot"></span>
+                                @player.Status
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<div class="legend-panel">
+    <strong>Leyenda:</strong>
+    <span><i class="legend-dot green"></i> Alto: índice ≥ 75</span>
+    <span><i class="legend-dot yellow"></i> Medio: índice entre 50 y 74.99</span>
+    <span><i class="legend-dot red"></i> Bajo: índice &lt; 50</span>
+</div>

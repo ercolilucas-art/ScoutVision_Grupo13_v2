@@ -1,0 +1,718 @@
+﻿@model ScoutVision.Web.Models.ReportesIndexViewModel
+
+@{
+    ViewData["Title"] = "Reportes";
+
+    string equipoSeleccionado = Model.EquipoId == 0
+        ? "Todos los equipos"
+        : Model.Equipos.FirstOrDefault(e => e.Id == Model.EquipoId)?.Nombre
+            ?? "Equipo seleccionado";
+
+    decimal maxIndice = Math.Max(
+        1m,
+        Model.RendimientoEquipos
+            .Where(e => e.IndicePromedio.HasValue)
+            .Select(e => e.IndicePromedio!.Value)
+            .DefaultIfEmpty(0m)
+            .Max());
+}
+
+<style>
+    /* Filtros y acciones */
+
+    .rep-toolbar {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        padding: 20px 24px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        margin: 24px 0;
+    }
+
+    .rep-filter {
+        display: flex;
+        align-items: end;
+        flex-wrap: wrap;
+        gap: 12px;
+        flex: 1;
+    }
+
+    .rep-field {
+        min-width: 200px;
+        flex: 1;
+    }
+
+        .rep-field label {
+            display: block;
+            color: #a7bdcc;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .rep-field select {
+            width: 100%;
+            min-height: 43px;
+            padding: 0 12px;
+            border-radius: 9px;
+            border: 1px solid var(--line);
+            background: #112639;
+            color: #eef6fb;
+        }
+
+    .rep-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 43px;
+        padding: 0 17px;
+        border-radius: 9px;
+        border: 0;
+        background: var(--green);
+        color: #071b10;
+        font-weight: 800;
+        text-decoration: none;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+        .rep-btn:hover {
+            opacity: .85;
+            color: #071b10;
+        }
+
+    .rep-btn-secondary {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: #eef6fb;
+    }
+
+        .rep-btn-secondary:hover {
+            color: #eef6fb;
+        }
+
+    /* Indicadores */
+
+    .rep-kpis {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .rep-kpi {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 23px;
+        min-width: 0;
+    }
+
+    .rep-kpi-icon {
+        color: #9fea58;
+        font-size: 23px;
+        margin-bottom: 15px;
+    }
+
+    .rep-kpi-label {
+        display: block;
+        color: #a7bdcc;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .rep-kpi-value {
+        color: #eef6fb;
+        font-size: 32px;
+        font-weight: 800;
+    }
+
+    /* Paneles */
+
+    .rep-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 26px;
+        margin-bottom: 22px;
+        min-width: 0;
+    }
+
+        .rep-panel h2 {
+            color: #eef6fb;
+            font-size: 20px;
+            margin: 0 0 6px;
+        }
+
+    .rep-panel-desc {
+        color: #a7bdcc;
+        font-size: 13px;
+        line-height: 1.6;
+        margin: 0 0 23px;
+    }
+
+    /* Gráficos */
+
+    .rep-charts {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .rep-bar-row {
+        margin-bottom: 22px;
+    }
+
+    .rep-bar-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 9px;
+        font-size: 13px;
+        color: #eef6fb;
+    }
+
+        .rep-bar-head span:first-child {
+            overflow-wrap: anywhere;
+        }
+
+        .rep-bar-head strong {
+            white-space: nowrap;
+            color: #9fea58;
+        }
+
+    .rep-bar-track {
+        width: 100%;
+        height: 12px;
+        background: #182d3d;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .rep-bar-fill {
+        height: 100%;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #3dbe72, #9fea58);
+    }
+
+    .rep-chart-empty {
+        color: #a7bdcc;
+        padding: 20px 0;
+        font-size: 14px;
+    }
+
+    /* Tablas */
+
+    .rep-table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+    }
+
+    .rep-table {
+        width: 100%;
+        min-width: 760px;
+        border-collapse: collapse;
+    }
+
+        .rep-table thead {
+            background: rgba(255, 255, 255, .045);
+        }
+
+        .rep-table th {
+            text-align: left;
+            padding: 15px 13px;
+            color: #a7bdcc;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .rep-table td {
+            padding: 16px 13px;
+            color: #eef6fb;
+            border-top: 1px solid var(--line);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .rep-table tbody tr:hover {
+            background: rgba(255, 255, 255, .035);
+        }
+
+    .rep-player-link {
+        color: #eef6fb;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+        .rep-player-link:hover {
+            color: #9fea58;
+        }
+
+    .rep-index {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 12px;
+        color: #9fea58;
+        background: rgba(159, 234, 88, .09);
+        border: 1px solid rgba(159, 234, 88, .25);
+        border-radius: 8px;
+        font-weight: 800;
+    }
+
+    .rep-rank {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 27px;
+        height: 27px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: #a7bdcc;
+        font-weight: 800;
+    }
+
+    .rep-empty {
+        padding: 26px 0;
+        color: #a7bdcc;
+        font-size: 14px;
+    }
+
+    .rep-nota {
+        font-size: 13px;
+        color: #a7bdcc;
+        line-height: 1.7;
+        margin-top: 18px;
+    }
+
+    /* Responsive */
+
+    @@media (max-width: 1100px) {
+        .rep-kpis {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .rep-charts {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 620px) {
+        .rep-toolbar {
+            padding: 16px;
+        }
+
+        .rep-panel {
+            padding: 18px;
+        }
+
+        .rep-kpis {
+            gap: 10px;
+        }
+
+        .rep-kpi {
+            padding: 16px;
+        }
+
+        .rep-kpi-value {
+            font-size: 26px;
+        }
+
+        .rep-filter .rep-btn {
+            flex: 1;
+        }
+    }
+</style>
+
+<!-- Encabezado -->
+
+<div class="page-header">
+    <div>
+        <h1>Reportes <span>estadísticos</span></h1>
+        <p>
+            Indicadores, comparativas y análisis del rendimiento
+            de los futbolistas registrados.
+        </p>
+    </div>
+
+    <div class="season-chip">
+        Temporada 2026
+    </div>
+</div>
+
+<!-- Filtro y descarga -->
+
+<div class="rep-toolbar">
+
+    <form class="rep-filter"
+          asp-controller="Reportes"
+          asp-action="Index"
+          method="get">
+
+        <div class="rep-field">
+            <label for="equipoId">Analizar equipo</label>
+
+            <select id="equipoId" name="equipoId">
+
+                @if (Model.EquipoId == 0)
+                {
+                    <option value="0" selected>
+                        Todos los equipos
+                    </option>
+                }
+                else
+                {
+                    <option value="0">
+                        Todos los equipos
+                    </option>
+                }
+
+                @foreach (var equipo in Model.Equipos)
+                {
+                    if (Model.EquipoId == equipo.Id)
+                    {
+                        <option value="@equipo.Id" selected>
+                            @equipo.Nombre
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="@equipo.Id">
+                            @equipo.Nombre
+                        </option>
+                    }
+                }
+
+            </select>
+        </div>
+
+        <button class="rep-btn" type="submit">
+            Aplicar filtro
+        </button>
+
+        <a class="rep-btn rep-btn-secondary"
+           asp-controller="Reportes"
+           asp-action="Index">
+            Limpiar
+        </a>
+
+    </form>
+
+    <a class="rep-btn"
+       asp-controller="Reportes"
+       asp-action="ExportarCsv"
+       asp-route-equipoId="@Model.EquipoId">
+        ↓ Exportar CSV
+    </a>
+
+</div>
+
+<!-- Indicadores principales -->
+
+<div class="rep-kpis">
+
+    <div class="rep-kpi">
+        <div class="rep-kpi-icon">♟</div>
+        <span class="rep-kpi-label">Equipos</span>
+        <strong class="rep-kpi-value">@Model.TotalEquipos</strong>
+    </div>
+
+    <div class="rep-kpi">
+        <div class="rep-kpi-icon">♙</div>
+        <span class="rep-kpi-label">Jugadores</span>
+        <strong class="rep-kpi-value">@Model.TotalJugadores</strong>
+    </div>
+
+    <div class="rep-kpi">
+        <div class="rep-kpi-icon">▣</div>
+        <span class="rep-kpi-label">Partidos 2026</span>
+        <strong class="rep-kpi-value">@Model.TotalPartidos</strong>
+    </div>
+
+    <div class="rep-kpi">
+        <div class="rep-kpi-icon">▤</div>
+        <span class="rep-kpi-label">Participaciones 2026</span>
+        <strong class="rep-kpi-value">@Model.TotalParticipaciones</strong>
+    </div>
+
+</div>
+
+<!-- Gráficos -->
+
+<div class="rep-charts">
+
+    <section class="rep-panel">
+
+        <h2>Rendimiento por equipo</h2>
+
+        <p class="rep-panel-desc">
+            Índice promedio de rendimiento de los jugadores
+            de cada club en 2026.
+        </p>
+
+        @if (Model.RendimientoEquipos.Count == 0)
+        {
+            <p class="rep-chart-empty">
+                No hay equipos disponibles.
+            </p>
+        }
+        else
+        {
+            @foreach (var equipo in Model.RendimientoEquipos)
+            {
+                decimal indice = equipo.IndicePromedio ?? 0;
+
+                string ancho =
+                (indice * 100m / maxIndice)
+                .ToString(
+                "0.#",
+                System.Globalization.CultureInfo.InvariantCulture);
+
+                <div class="rep-bar-row">
+
+                    <div class="rep-bar-head">
+                        <span>@equipo.Nombre</span>
+                        <strong>
+                            @(equipo.IndicePromedio?.ToString("0.00") ?? "—")
+                        </strong>
+                    </div>
+
+                    <div class="rep-bar-track">
+                        <div class="rep-bar-fill"
+                             style="width:@(ancho)%">
+                        </div>
+                    </div>
+
+                </div>
+            }
+        }
+
+    </section>
+
+    <section class="rep-panel">
+
+        <h2>Partidos por mes</h2>
+
+        <p class="rep-panel-desc">
+            Cantidad de encuentros registrados durante 2026.
+        </p>
+
+        @if (Model.ActividadMensual.Count == 0)
+        {
+            <p class="rep-chart-empty">
+                No hay partidos para mostrar.
+            </p>
+        }
+        else
+        {
+            @foreach (var mes in Model.ActividadMensual)
+            {
+                string ancho =
+                (mes.CantidadPartidos * 100m / Model.MaxPartidosMes)
+                .ToString(
+                "0.#",
+                System.Globalization.CultureInfo.InvariantCulture);
+
+                <div class="rep-bar-row">
+
+                    <div class="rep-bar-head">
+                        <span>@mes.Periodo</span>
+                        <strong>@mes.CantidadPartidos</strong>
+                    </div>
+
+                    <div class="rep-bar-track">
+                        <div class="rep-bar-fill"
+                             style="width:@(ancho)%">
+                        </div>
+                    </div>
+
+                </div>
+            }
+        }
+
+    </section>
+
+</div>
+
+<!-- Ranking general -->
+
+<section class="rep-panel">
+
+    <h2>Ranking de futbolistas</h2>
+
+    <p class="rep-panel-desc">
+        Los 10 jugadores con mayor índice de rendimiento
+        de la temporada 2026. Filtro: @equipoSeleccionado.
+    </p>
+
+    @if (Model.Ranking.Count == 0)
+    {
+        <p class="rep-empty">
+            No hay futbolistas disponibles.
+        </p>
+    }
+    else
+    {
+        <div class="rep-table-wrap">
+
+            <table class="rep-table">
+
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Jugador</th>
+                        <th>Equipo</th>
+                        <th>Posición</th>
+                        <th>Partidos</th>
+                        <th>Goles</th>
+                        <th>Asist.</th>
+                        <th>Minutos</th>
+                        <th>Índice</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @{
+                        int posicionRanking = 0;
+                    }
+
+                    @foreach (var jugador in Model.Ranking)
+                    {
+                        posicionRanking++;
+
+                        <tr>
+
+                            <td>
+                                <span class="rep-rank">
+                                    @posicionRanking
+                                </span>
+                            </td>
+
+                            <td>
+                                <a class="rep-player-link"
+                                   asp-controller="Jugadores"
+                                   asp-action="Perfil"
+                                   asp-route-id="@jugador.Id">
+                                    @jugador.Nombre ↗
+                                </a>
+                            </td>
+
+                            <td>@jugador.Equipo</td>
+
+                            <td>@jugador.Posicion</td>
+
+                            <td>@jugador.Partidos</td>
+
+                            <td>@jugador.Goles</td>
+
+                            <td>@jugador.Asistencias</td>
+
+                            <td>@jugador.Minutos</td>
+
+                            <td>
+                                <span class="rep-index">
+                                    @(jugador.Indice?.ToString("0.00") ?? "—")
+                                </span>
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+
+</section>
+
+<!-- Resumen por club -->
+
+<section class="rep-panel">
+
+    <h2>Comparativa de clubes</h2>
+
+    <p class="rep-panel-desc">
+        Cantidad de futbolistas, goles de temporada
+        e índice promedio por equipo.
+    </p>
+
+    @if (Model.RendimientoEquipos.Count == 0)
+    {
+        <p class="rep-empty">
+            No hay información disponible.
+        </p>
+    }
+    else
+    {
+        <div class="rep-table-wrap">
+
+            <table class="rep-table">
+
+                <thead>
+                    <tr>
+                        <th>Equipo</th>
+                        <th>Jugadores</th>
+                        <th>Goles 2026</th>
+                        <th>Índice promedio</th>
+                        <th>Plantel</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var equipo in Model.RendimientoEquipos)
+                    {
+                        <tr>
+
+                            <td>@equipo.Nombre</td>
+
+                            <td>@equipo.Jugadores</td>
+
+                            <td>@equipo.Goles</td>
+
+                            <td>
+                                <span class="rep-index">
+                                    @(equipo.IndicePromedio?.ToString("0.00") ?? "—")
+                                </span>
+                            </td>
+
+                            <td>
+                                <a class="rep-player-link"
+                                   asp-controller="Jugadores"
+                                   asp-action="Index"
+                                   asp-route-equipoId="@equipo.Id">
+                                    Ver jugadores →
+                                </a>
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+
+</section>
+
+<p class="rep-nota">
+    Los resultados corresponden a los registros académicos
+    almacenados en PostgreSQL. Los índices de rendimiento y
+    estadísticas de temporada se obtienen de player_performance;
+    los partidos y participaciones se obtienen de football_match
+    y player_match_stats. Los registros de demostración no deben
+    interpretarse como estadísticas oficiales de los clubes.
+</p>
